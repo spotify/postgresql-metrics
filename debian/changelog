@@ -1,0 +1,5 @@
+postgresql-metrics (0.2.0) unstable; urgency=low
+
+  * Initial open sourced release
+
+ -- Hannu Varjoranta <hannu.varjoranta@spotify.com>  Fri, 21 Aug 2015 11:05:01 +0000

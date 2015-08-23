@@ -1,0 +1,16 @@
+description "postgresql-metrics process"
+author "Hannu Varjoranta <hannu.varjoranta@spotify.com>"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+kill signal SIGTERM
+
+respawn limit 15 30
+
+script
+    exec /usr/bin/postgresql-metrics long-running-ffwd
+end script
+
+# prevent re-spawning more than once every 10 seconds
+post-stop exec sleep 10

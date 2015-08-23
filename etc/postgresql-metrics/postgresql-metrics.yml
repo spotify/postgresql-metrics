@@ -1,0 +1,13 @@
+---
+# Notice that this configuration will overwrite the configuration
+# in default folder, keeping the values in default, not overwritten here.
+postgres:
+    host: "127.0.0.1"
+    user: "my_postgres_user"
+    password: "my_secret"
+    databases:
+        - postgres
+
+# Notice that if you overwrite a list, like db_functions,
+# you will overwrite all the values in the default list,
+# so copy from default what you want to retain.
