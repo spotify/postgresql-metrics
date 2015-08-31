@@ -275,7 +275,7 @@ def main():
     conf = find_and_parse_config(args.config_path)
     if 'postgres' not in conf:
         raise Exception("failed parsing configuration from: " + args.config_path)
-    log_level = conf.get('log').get('log_level', 'debug')
+    log_level = conf.get('log', {}).get('log_level', 'debug')
 
     if args.command == 'all':
         init_logging_stderr(log_level)
