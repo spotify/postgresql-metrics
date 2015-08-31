@@ -53,8 +53,25 @@ def init_logging_file(filename, log_level='notset', rotate_log=True, rotate_max_
 
 
 def merge_configs(to_be_merged, default):
-    """Merges two configuration dictionaries by overwriting values with same keys,
-    with the priority on values given on the 'left' side, so the to_be_merged dict.
+    """Merges two configuration dictionaries by overwriting values with
+    same keys, with the priority on values given on the 'left' side, so
+    the to_be_merged dict.
+
+    Notice that with lists in the configuration, it skips from the default
+    (right side) the tuples in that which already exist in the left side
+    to_be_merged list. This is used to be able to override time intervals for
+    default values in the configuration.
+
+    Example:
+    In [1]: x = [["get_stats_disk_usage_for_database", 180],
+                 ["get_stats_tx_rate_for_database", 500]]
+    In [2]: y = [["get_stats_seconds_since_last_vacuum_per_table", 60],
+                 ["get_stats_tx_rate_for_database", 60]]
+    In [3]: merge_configs(x, y)
+    Out[3]:
+    [['get_stats_disk_usage_for_database', 180],
+     ['get_stats_tx_rate_for_database', 500],
+     ['get_stats_seconds_since_last_vacuum_per_table', 60]]
     """
     if isinstance(to_be_merged, dict) and isinstance(default, dict):
         for k, v in default.iteritems():
@@ -63,7 +80,15 @@ def merge_configs(to_be_merged, default):
             else:
                 to_be_merged[k] = merge_configs(to_be_merged[k], v)
     elif isinstance(to_be_merged, list) and isinstance(default, list):
-        to_be_merged = default + to_be_merged
+        same_keys = set()
+        for x in to_be_merged:
+            for y in default:
+                if isinstance(x, (list, set, tuple)) and isinstance(y, (list, set, tuple)) and len(
+                        x) > 0 and len(y) > 0 and x[0] == y[0]:
+                    same_keys.add(x[0])
+        for y in default:
+            if not isinstance(y, (list, set, tuple)) or y[0] not in same_keys:
+                to_be_merged.append(y)
     return to_be_merged
 
 
