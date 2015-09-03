@@ -20,6 +20,15 @@ plain JSON sent over a UDP socket, so you can use whatever
 UDP socket endpoint, which understands JSON, to consume the metrics.
 
 
+## Prerequisites
+
+The technology versions mentioned below are tested to work, but the code will work most likely on other (older or later) versions as well. Please add an issue to this project, if you detect missing prerequisites, or have actually tested this package on some unmentioned versions from below.
+
+* Python 2.7
+* PostgreSQL 9.3 or later
+* Debian based distribution with Upstart, if you want to use the packaging functionality
+
+
 ## Building and Installing
 
 You can build a Debian package out of this by calling *debuild* in project
