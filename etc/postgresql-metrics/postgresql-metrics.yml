@@ -8,6 +8,6 @@ postgres:
     databases:
         - postgres
 
-# Notice that if you overwrite a list, like db_functions,
-# you will overwrite all the values in the default list,
-# so copy from default what you want to retain.
+# Notice that if you overwrite a list here, like db_functions,
+# you will overwrite only the values that have same function name.
+# There is no need to copy everything from the default configuration.
