@@ -28,12 +28,14 @@ LOG = get_logger()
 DERIVE_DICT = dict()
 
 
-def get_db_connection(database, username, password, host='127.0.0.1', port=5432):
+def get_db_connection(database, username, password, host='127.0.0.1', port=5432,
+                      connect_timeout=10):
     connection = psycopg2.connect(user=username,
                                   password=password,
                                   host=host,
                                   port=int(port),
-                                  database=database)
+                                  database=database,
+                                  connect_timeout=connect_timeout)
     connection.autocommit = True
     return connection
 
