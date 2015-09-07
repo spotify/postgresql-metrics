@@ -81,7 +81,7 @@ statistics functions and views.
 You need to provide administrator user to the *prepare-db* call, which
 the tool is kind enough to ask. You don't need to provide credentials, if
 you are running the *prepare-db* with a local user that is configured to be
-trusted locally by the PostgreSQL cluster (in pg_hba.conf), and is
+trusted locally by the PostgreSQL cluster (in *pg_hba.conf*), and is
 a super user, like the default *postgres* user created by some distribution
 packages (e.g. Debian). You can do the prepare-db call e.g. as follows:
 
@@ -96,6 +96,25 @@ Notice that you can also run the SQL found in the *sql* folder
 within this repository manually in your PostgreSQL cluster, which does
 the same setup as the *prepare-db* call.
 
+### Grant Access for Metrics User
+
+In addition to granting access to the statistics gathering functions and views
+within your PostgreSQL cluster (previous step), you need to also add access
+to the metrics user into the host based access file (*pg_hba.conf*).
+
+Add one line per database you are monitoring into the end of the *pg_hba.conf*
+file for your cluster:
+
+```
+host my_database_name metrics_user_name 127.0.0.1/32 md5  # metrics user access
+```
+
+Replace the *my_database_name* and *metrics_user_name* with the values you
+configured into the postgresql-metrics configuration in **Edit Configuration**
+step above.
+
+You need to reload (or restart) your server after editing *pg_hba.conf* for
+the changes to take effect.
 
 ### Getting Metrics
 
@@ -187,7 +206,7 @@ Called once per your Postgres cluster.
 * **get_stats_lock_statistics**:
   This metric shows locks being waited upon by queries, and the amount of
   locks granted. In general having any query waiting for locks for any
-  extended period of time is a sign of problems, like unsolvable deadlocks.
+  extended period of time is a sign of problems, like heavy lock contention.
 
 * **get_stats_heap_hit_statistics**:
   This metric shows the amount of reads hitting the memory buffers on your
@@ -197,7 +216,7 @@ Called once per your Postgres cluster.
 
   Notice that the read amounts are not actual read queries, but the amount
   of blocks read. You will get good idea of amount of reads hitting your
-  database, when comparing with the transaction rate.
+  database, when comparing these values with the transaction rate.
 
 * **get_stats_replication_delays**:
   This metric shows the amount of bytes the replication delay is behind master
