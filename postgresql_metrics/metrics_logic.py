@@ -37,8 +37,9 @@ from postgresql_metrics.prepare_db import prepare_databases_for_metrics
 from postgresql_metrics.common import (
     init_logging_file,
     init_logging_stderr,
+    init_logging_syslog,
     get_logger,
-    find_and_parse_config,
+    find_and_parse_config
 )
 
 LOG = get_logger()
@@ -292,6 +293,8 @@ def main():
         if conf['log']['log_to_file'] is True:
             init_logging_file(conf['log']['filename'], log_level,
                               conf['log']['rotate_file_log'], conf['log']['file_rotate_max_size'])
+        if conf['log']['log_to_syslog'] is True:
+            init_logging_syslog(log_level, facility=conf['log']['syslog_facility'])
         run_long_running_ffwd(conf)
 
     elif args.command == 'prepare-db':

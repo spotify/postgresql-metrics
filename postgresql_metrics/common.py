@@ -39,17 +39,26 @@ def init_logging_stderr(log_level='notset', bubble=False):
     get_logger().debug("stderr logging initialized")
 
 
-def init_logging_file(filename, log_level='notset', rotate_log=True, rotate_max_size=10485760):
+def init_logging_file(filename, log_level='notset', rotate_log=True, rotate_max_size=10485760,
+                      bubble=True):
     log_dir = os.path.dirname(filename)
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     if rotate_log is True:
         handler = logbook.RotatingFileHandler(filename, level=figure_out_log_level(log_level),
-                                              max_size=int(rotate_max_size), bubble=True)
+                                              max_size=int(rotate_max_size), bubble=bubble)
     else:
-        handler = logbook.FileHandler(filename, level=figure_out_log_level(log_level), bubble=True)
+        handler = logbook.FileHandler(filename, level=figure_out_log_level(log_level),
+                                      bubble=bubble)
     handler.push_application()
     get_logger().debug("file based logging initialized in directory: " + log_dir)
+
+
+def init_logging_syslog(log_level='notset', facility='local0', bubble=True):
+    handler = logbook.SyslogHandler('postgresql-metrics', facility=facility,
+                                    level=figure_out_log_level(log_level), bubble=bubble)
+    handler.push_application()
+    get_logger().debug("syslog logging initialized")
 
 
 def merge_configs(to_be_merged, default):

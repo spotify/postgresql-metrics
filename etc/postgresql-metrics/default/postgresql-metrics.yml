@@ -16,6 +16,7 @@ log:
     # Notice that simple CLI calls will always log only to stderr independent
     # of these configuration values.
     log_to_stderr: false
+    log_to_syslog: false
     log_to_file: true
     # Log levels one of: critical, error, warning, notice, info, debug
     log_level: info
@@ -23,6 +24,8 @@ log:
     # Default file rotate size is is 10 MB.
     file_rotate_max_size: 10485760
     filename: /var/log/postgresql-metrics/postgresql-metrics.log
+    # Syslog facility to use, if syslog logging enabled.
+    syslog_facility: user
 
 # FFWD is used for pushing metrics out for the long running process
 ffwd:
