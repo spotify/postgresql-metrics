@@ -1,3 +1,9 @@
+postgresql-metrics (0.2.1) unstable; urgency=low
+
+  * Add support for syslog logging
+
+ -- Hannu Varjoranta <hannu.varjoranta@spotify.com>  Tue, 8 Sep 2015 09:34:58 +0000
+
 postgresql-metrics (0.2.0) unstable; urgency=low
 
   * Initial open sourced release
