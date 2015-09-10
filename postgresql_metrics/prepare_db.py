@@ -59,6 +59,16 @@ def connect_as_super_user(db_name, conf):
     return db_connection
 
 
+def check_if_database_is_slave(db_connection):
+    """Returns True if the queried database is a slave node,
+    i.e. is in recovery mode streaming data from master.
+    """
+    with db_connection.cursor() as c:
+        c.execute("SELECT pg_is_in_recovery()")
+        result = c.fetchone()
+        return bool(result) and result[0]
+
+
 def check_if_role_exists(db_connection, role_name):
     with db_connection.cursor() as c:
         c.execute("SELECT rolname FROM pg_roles WHERE rolname=%s", [role_name])
@@ -158,6 +168,10 @@ def prepare_databases_for_metrics(conf):
     for db_name in db_names:
         LOG.info("connecting to database '{}' as super user", db_name)
         db_connection = connect_as_super_user(db_name, conf)
+
+        if check_if_database_is_slave(db_connection):
+            LOG.info("database is a slave, run prepare-db on master")
+            break
 
         if not check_if_role_exists(db_connection, metrics_user):
             create_role_with_login(db_connection, metrics_user, metrics_user_password)
