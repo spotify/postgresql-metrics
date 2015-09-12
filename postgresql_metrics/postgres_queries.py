@@ -185,14 +185,14 @@ def get_oldest_transaction_timestamp(conn):
 
 
 def get_replication_delays(conn):
-    sql = ("SELECT client_addr, write_location, replay_location, "
-           "pg_xlog_location_diff(write_location, replay_location) AS bytes_diff "
+    sql = ("SELECT client_addr, "
+           "pg_xlog_location_diff(pg_current_xlog_location(), replay_location) AS bytes_diff "
            "FROM public.pg_stat_repl")
     all_delays = []
     results = query(conn, sql)
     for result_row in results:
         client_addr = result_row[0]
-        bytes_diff = int(result_row[3])
+        bytes_diff = int(result_row[1])
         all_delays.append((client_addr, bytes_diff))
     return all_delays
 
