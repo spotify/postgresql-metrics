@@ -1,3 +1,10 @@
+postgresql-metrics (0.2.2) unstable; urgency=low
+
+  * fix bug in replication delay metric
+  * add support for syslog based logging
+
+ -- Hannu Varjoranta <hannu.varjoranta@spotify.com>  Mon, 14 Sep 2015 08:04:11 +0000
+
 postgresql-metrics (0.2.1) unstable; urgency=low
 
   * Add support for syslog logging
