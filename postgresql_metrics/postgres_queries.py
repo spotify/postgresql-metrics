@@ -57,7 +57,10 @@ def get_metric_diff(db_name, metric_name, current_time, current_value):
     if derive_dict_key in DERIVE_DICT:
         last_time, last_value = DERIVE_DICT[derive_dict_key]
         seconds_since_last_check = (current_time - last_time).seconds
-        diff = float(current_value - last_value) / seconds_since_last_check
+        if seconds_since_last_check == 0:
+            diff = 0
+        else:
+            diff = float(current_value - last_value) / seconds_since_last_check
     DERIVE_DICT[derive_dict_key] = (current_time, current_value)
     return diff
 
@@ -156,7 +159,10 @@ def get_heap_hit_statistics(conn):
     recent_heap_hit = get_metric_diff(db_name, 'heap_hit', time_now, heap_hit_now)
     recent_heap_hit_ratio = None
     if recent_heap_read is not None:
-        recent_heap_hit_ratio = recent_heap_hit / float(recent_heap_hit + recent_heap_read)
+        if recent_heap_hit == 0:
+            recent_heap_hit_ratio = 0
+        else:
+            recent_heap_hit_ratio = recent_heap_hit / float(recent_heap_hit + recent_heap_read)
     return db_name, recent_heap_read, recent_heap_hit, recent_heap_hit_ratio
 
 
@@ -217,8 +223,11 @@ def get_index_hit_rates(conn):
     index_hit_rates = []
     LOG.debug(results)
     for db_name, table_name, index_hit, index_miss in results:
-        if index_hit and index_miss:
-            recent_ratio = index_hit / float(index_miss + index_hit)
+        if index_hit is not None and index_miss is not None:
+            if index_hit == 0:
+                recent_ratio = 0
+            else:
+                recent_ratio = index_hit / float(index_miss + index_hit)
             index_hit_rates.append((db_name, table_name, recent_ratio))
         else:
             index_hit_rates.append((db_name, table_name, None))
