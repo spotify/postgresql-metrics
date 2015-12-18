@@ -110,12 +110,13 @@ def get_stats_functions_from_conf(func_key_name, conf):
     """Finds the statistics function configured, and ensures that the callables
     are found from metrics_gatherer.py."""
     stats_functions = []
-    for func_name, call_interval in conf[func_key_name]:
-        stats_func = getattr(metrics_gatherer, func_name)
-        if not stats_func or not callable(stats_func):
-            raise Exception("statistics function '" + func_name +
-                            "' not found in configuration under key name: " + func_key_name)
-        stats_functions.append((stats_func, int(call_interval)))
+    if func_key_name in conf and conf[func_key_name] is not None:
+        for func_name, call_interval in conf[func_key_name]:
+            stats_func = getattr(metrics_gatherer, func_name)
+            if not stats_func or not callable(stats_func):
+                raise Exception("statistics function '" + func_name +
+                                "' not found in configuration under key name: " + func_key_name)
+            stats_functions.append((stats_func, int(call_interval)))
     return stats_functions
 
 
