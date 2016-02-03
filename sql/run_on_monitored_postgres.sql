@@ -34,7 +34,7 @@ GRANT SELECT ON public.pg_stat_repl TO metricsuser;
 
 CREATE EXTENSION IF NOT EXISTS pgstattuple;
 
-CREATE OR REPLACE FUNCTION pgstattuple_for_table_oid(INT)
+CREATE OR REPLACE FUNCTION pgstattuple_for_table_oid(BIGINT)
   RETURNS TABLE (current_database NAME, table_len BIGINT, tuple_count BIGINT,
   tuple_len BIGINT, tuple_percent FLOAT, dead_tuple_count BIGINT,
   dead_tuple_len BIGINT, dead_tuple_percent FLOAT, free_space BIGINT,
@@ -43,4 +43,4 @@ BEGIN
   RETURN QUERY(SELECT current_database(), * FROM pgstattuple($1));
 END$$ LANGUAGE plpgsql SECURITY DEFINER;
 
-GRANT EXECUTE ON FUNCTION pgstattuple_for_table_oid(INT) TO metricsuser;
+GRANT EXECUTE ON FUNCTION pgstattuple_for_table_oid(BIGINT) TO metricsuser;
