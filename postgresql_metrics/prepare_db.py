@@ -29,7 +29,7 @@ LOG = get_logger("postgresql-metrics-prepare-db")
 
 REPLICATION_STATS_VIEW = 'public.pg_stat_repl'
 PGSTATTUPLES_FUNC_NAME = 'pgstattuple_for_table_oid'
-PGSTATTUPLES_FUNC = PGSTATTUPLES_FUNC_NAME + '(INT)'
+PGSTATTUPLES_FUNC = PGSTATTUPLES_FUNC_NAME + '(BIGINT)'
 
 
 def query_user_for_superuser_credentials():
