@@ -56,7 +56,7 @@ def get_metric_diff(db_name, metric_name, current_time, current_value):
     diff = None
     if derive_dict_key in DERIVE_DICT:
         last_time, last_value = DERIVE_DICT[derive_dict_key]
-        seconds_since_last_check = (current_time - last_time).seconds
+        seconds_since_last_check = int((current_time - last_time).total_seconds())
         if seconds_since_last_check == 0:
             diff = 0
         else:
@@ -142,7 +142,7 @@ def get_seconds_since_last_vacuum_per_table(conn):
         latest_vacuum = None
         if last_vacuum or last_autovacuum:
             latest_vacuum = max([x for x in (last_vacuum, last_autovacuum) if x])
-        seconds_since_last_vacuum = (time_now - (latest_vacuum or time_now)).seconds
+        seconds_since_last_vacuum = int((time_now - (latest_vacuum or time_now)).total_seconds())
         table_last_vacuum_list.append((db_name, table_name, seconds_since_last_vacuum))
     return table_last_vacuum_list
 
@@ -185,7 +185,7 @@ def get_oldest_transaction_timestamp(conn):
     results = query(conn, sql)
     if results:
         db_name, time_now, xact_start = results[0]
-        seconds_since_oldest_xact_start = (time_now - (xact_start or time_now)).seconds
+        seconds_since_oldest_xact_start = int((time_now - (xact_start or time_now)).total_seconds())
         return db_name, seconds_since_oldest_xact_start
     return None, None
 
