@@ -23,7 +23,7 @@ install_requirements = parse_requirements('requirements.txt')
 requirements = [str(ir.req) for ir in install_requirements]
 
 setup(name='postgresql-metrics',
-      version='0.2.2',
+      version='0.2.3',
       author=u'Hannu Varjoranta',
       author_email='hannu.varjoranta@spotify.com',
       url='https://github.com/spotify/postgresql-metrics',

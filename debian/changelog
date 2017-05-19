@@ -1,3 +1,9 @@
+postgresql-metrics (0.2.3) unstable; urgency=low
+
+  * Fix some metrics conversion issues
+
+ -- Hannu Varjoranta <hannu.varjoranta@spotify.com>  Fri, 19 May 2017 11:28:33 +0000
+
 postgresql-metrics (0.2.2) unstable; urgency=low
 
   * fix bug in replication delay metric
