@@ -1,3 +1,9 @@
+postgresql-metrics (0.2.4) unstable; urgency=low
+
+  * Support for PostgreSQL 10
+
+ -- Richard Mahlberg <richard@spotify.com>  Thu, 16 Nov 2017 09:42:30 +0000
+
 postgresql-metrics (0.2.3) unstable; urgency=low
 
   * Fix some metrics conversion issues
