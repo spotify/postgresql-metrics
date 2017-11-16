@@ -194,6 +194,9 @@ def get_replication_delays(conn):
     sql = ("SELECT client_addr, "
            "pg_xlog_location_diff(pg_current_xlog_location(), replay_location) AS bytes_diff "
            "FROM public.pg_stat_repl")
+    if conn.server_version >= 100000: # PostgreSQL 10 and higher
+        sql = sql.replace('_xlog', '_wal')
+        sql = sql.replace('_location', '_lsn')
     all_delays = []
     results = query(conn, sql)
     for result_row in results:

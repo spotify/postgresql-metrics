@@ -228,9 +228,9 @@ Called once per your Postgres cluster.
 
 * **get_stats_wal_file_amount**:
   This graph shows the amount of files in your database clusters WAL log
-  directory (pg_xlog). If the WAL file amount starts to suddenly increase,
-  you probably have issues with your WAL archiving process, which might
-  lead to the disk filling up, and you database cluster crashing.
+  directory (pg_wal or pg_xlog). If the WAL file amount starts to suddenly
+  increase, you probably have issues with your WAL archiving process, which
+  might lead to the disk filling up, and you database cluster crashing.
 
 
 ## Short Overview of Python Modules
