@@ -11,16 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pip.req import parse_requirements
 from setuptools import find_packages
 from setuptools import setup
 
-# parse_requirements() returns generator of pip.req.InstallRequirement objects
-install_requirements = parse_requirements('requirements.txt')
-
-# requirements below is a list of requirements:
-#   e.g. ['psycopg2==2.6.1', 'logbook==0.10.1']
-requirements = [str(ir.req) for ir in install_requirements]
+def requirements(f):
+  reqs = open(f, 'r').read().splitlines()
+  reqs = [r for r in reqs if not r.strip().startswith('#')]
+  return reqs
 
 setup(name='postgresql-metrics',
       version='0.2.4',
@@ -29,7 +26,7 @@ setup(name='postgresql-metrics',
       url='https://github.com/spotify/postgresql-metrics',
       description='Simple service to provide metrics for your PostgreSQL database',
       packages=find_packages(),
-      install_requires=requirements,
+      install_requires=requirements('requirements.txt'),
       entry_points={
           'console_scripts': [
               'postgresql-metrics=postgresql_metrics.metrics_logic:main',
