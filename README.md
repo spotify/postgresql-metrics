@@ -92,10 +92,6 @@ sudo su -c "postgresql-metrics prepare-db" postgres
 It is safe to call the *prepare-db* multiple times for the same database
 (the call is idempotent).
 
-Notice that you can also run the SQL found in the *sql* folder
-within this repository manually in your PostgreSQL cluster, which does
-the same setup as the *prepare-db* call.
-
 ### Grant Access for Metrics User
 
 In addition to granting access to the statistics gathering functions and views
