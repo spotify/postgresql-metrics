@@ -42,6 +42,7 @@ from postgresql_metrics.default_metrics import (
     metric_index_hit_ratio,
     metric_replication_delay_bytes,
     metric_wal_file_amount,
+    metric_incoming_replication_running,
 )
 
 from postgresql_metrics.localhost_postgres_stats import get_amount_of_wal_files
@@ -58,6 +59,7 @@ from postgresql_metrics.postgres_queries import (
     get_index_hit_rates,
     get_replication_delays,
     get_tables_with_oids_for_current_db,
+    get_wal_receiver_status,
 )
 
 
@@ -149,3 +151,8 @@ def get_stats_replication_delays(db_connection):
 
 def get_stats_wal_file_amount(data_dir):
     return [metric_wal_file_amount(get_amount_of_wal_files(data_dir))]
+
+
+def get_stats_incoming_replication_status(db_connection):
+    return [metric_incoming_replication_running(host, status)
+            for host, status in get_wal_receiver_status(db_connection)]
