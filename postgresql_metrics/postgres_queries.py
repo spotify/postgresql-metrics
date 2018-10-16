@@ -17,6 +17,7 @@ on having a connection to a Postgres database, and running queries through it.
 """
 
 import psycopg2
+import re
 
 from postgresql_metrics.common import get_logger
 
@@ -26,6 +27,9 @@ LOG = get_logger()
 # contains mappings of metric-name: (last_timestamp, last_value)
 # used to derive metric value diffs between the current and the previous value
 DERIVE_DICT = dict()
+
+# regex used to extra host from conninfo string
+CONNINFO_HOST_RE = re.compile(r'($|\s)host=(?P<host>.*?)(^|\s)')
 
 
 def get_db_connection(database, username, password, host='127.0.0.1', port=5432,
@@ -235,3 +239,13 @@ def get_index_hit_rates(conn):
         else:
             index_hit_rates.append((db_name, table_name, None))
     return index_hit_rates
+
+
+def get_wal_receiver_status(conn):
+    sql = "SELECT conninfo, status FROM pg_stat_wal_receiver"
+    results = query(conn, sql)
+    host_replication_status = []
+    for conn_info, status in results:
+        host = CONNINFO_HOST_RE.search(conn_info).groupdict().get('host', 'UNKNOWN')
+        host_replication_status.append((host, status))
+    return host_replication_status

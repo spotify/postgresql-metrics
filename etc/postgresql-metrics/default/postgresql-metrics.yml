@@ -49,6 +49,7 @@ db_functions:
     # table bloat is a heavy query, which might take many minutes to execute for huge tables
     # 43200 = 12*60*60 = 12 hours
     - ["get_stats_table_bloat", 43200]
+    - ["get_stats_incoming_replication_status", 30]
 
 # global_db_functions: Functions taking DB connection and returning a list of metrics,
 #                      called once per the whole database cluster.

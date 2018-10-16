@@ -143,3 +143,10 @@ def metric_replication_delay_bytes(client_addr, value):
                                  {'what': 'replication-delay-bytes',
                                   'slave': client_addr,
                                   'unit': 'B'})
+
+
+def metric_incoming_replication_running(replication_host, value):
+    return create_default_metric(value == "streaming",
+                                 {'what': 'incoming-replication-running',
+                                  'master': replication_host,
+                                  'unit': 'msg'})
