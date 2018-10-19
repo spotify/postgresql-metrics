@@ -154,5 +154,5 @@ def get_stats_wal_file_amount(data_dir):
 
 
 def get_stats_incoming_replication_status(db_connection):
-    return [metric_incoming_replication_running(host, status)
-            for host, status in get_wal_receiver_status(db_connection)]
+    return [metric_incoming_replication_running(host, is_streaming)
+            for host, is_streaming in get_wal_receiver_status(db_connection)]
