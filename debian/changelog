@@ -1,3 +1,9 @@
+postgresql-metrics (0.2.5) unstable; urgency=low
+
+  * Report replication status from WAL receivers
+
+ -- Hannu Varjoranta <hannu.varjoranta@spotify.com>  Mon, 29 Oct 2018 16:32:00 +0000
+
 postgresql-metrics (0.2.4) unstable; urgency=low
 
   * Support for PostgreSQL 10

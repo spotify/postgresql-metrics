@@ -20,7 +20,7 @@ def requirements(f):
   return reqs
 
 setup(name='postgresql-metrics',
-      version='0.2.4',
+      version='0.2.5',
       author=u'Hannu Varjoranta',
       author_email='hannu.varjoranta@spotify.com',
       url='https://github.com/spotify/postgresql-metrics',
