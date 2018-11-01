@@ -243,7 +243,7 @@ def get_index_hit_rates(conn):
 
 def get_wal_receiver_status(conn):
     sql = ("SELECT conninfo, CASE WHEN status = 'streaming' THEN 1 ELSE 0 END "
-           "FROM pg_stat_wal_receiver")
+           "FROM public.stat_incoming_replication")
     results = query(conn, sql)
     host_replication_status = []
     for conn_info, status in results:
