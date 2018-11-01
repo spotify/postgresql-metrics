@@ -21,6 +21,7 @@ and creating required functions and views.
 import getpass
 
 import psycopg2
+from psycopg2 import sql
 
 from postgresql_metrics.postgres_queries import get_db_connection
 from postgresql_metrics.common import get_logger
@@ -30,6 +31,9 @@ LOG = get_logger("postgresql-metrics-prepare-db")
 REPLICATION_STATS_VIEW = 'public.pg_stat_repl'
 PGSTATTUPLES_FUNC_NAME = 'pgstattuple_for_table_oid'
 PGSTATTUPLES_FUNC = PGSTATTUPLES_FUNC_NAME + '(BIGINT)'
+
+PGVERSION_WAL_RECEIVER = 90600
+INCOMING_REPLICATION_STATS_VIEW = "stat_incoming_replication"
 
 
 def query_user_for_superuser_credentials():
@@ -134,7 +138,6 @@ END$$ LANGUAGE plpgsql SECURITY DEFINER;"""
         c.execute("CREATE VIEW " + REPLICATION_STATS_VIEW
                   + " AS SELECT * FROM public.pg_stat_repl()")
 
-
 def create_pgstattuples_extension(db_connection):
     LOG.info("creating extension pgstattuple with access function {}", PGSTATTUPLES_FUNC)
     sql = "CREATE OR REPLACE FUNCTION " + PGSTATTUPLES_FUNC + """
@@ -149,6 +152,25 @@ END$$ LANGUAGE plpgsql SECURITY DEFINER;"""
         c.execute("CREATE EXTENSION IF NOT EXISTS pgstattuple;")
         c.execute(sql)
 
+def check_if_incoming_replication_status_view_exists(db_connection):
+    with db_connection.cursor() as c:
+        c.execute("SELECT table_name FROM information_schema.tables "
+                  "WHERE table_name=%s", (INCOMING_REPLICATION_STATS_VIEW,))
+        result = c.fetchone()
+        return bool(result) and result[0] == INCOMING_REPLICATION_STATS_VIEW
+
+def create_incoming_replication_status_view(db_connection):
+    LOG.info("creating view {}", INCOMING_REPLICATION_STATS_VIEW)
+    func_sql = """CREATE OR REPLACE FUNCTION public.stat_incoming_replication()
+RETURNS SETOF pg_catalog.pg_stat_wal_receiver AS $$
+BEGIN
+RETURN QUERY(SELECT * FROM pg_catalog.pg_stat_wal_receiver);
+END$$ LANGUAGE plpgsql SECURITY DEFINER;"""
+    view_sql = "CREATE OR REPLACE VIEW public.{0} AS SELECT * FROM {0}()".format(
+        INCOMING_REPLICATION_STATS_VIEW)
+    with db_connection.cursor() as c:
+        c.execute(func_sql)
+        c.execute(view_sql)
 
 def prepare_databases_for_metrics(conf):
     """Tries first to connect to localhost database as default user,
@@ -217,5 +239,26 @@ def prepare_databases_for_metrics(conf):
         else:
             LOG.info("role '{}' already has execute privilege to function: {}",
                      metrics_user, PGSTATTUPLES_FUNC)
+
+        if db_connection.server_version >= PGVERSION_WAL_RECEIVER:
+            if not check_if_incoming_replication_status_view_exists(db_connection):
+                create_incoming_replication_status_view(db_connection)
+            else:
+                LOG.info("incoming replication status view already exists")
+
+            if not check_if_role_has_table_privilege(db_connection, metrics_user,
+                                                     INCOMING_REPLICATION_STATS_VIEW, 'select'):
+                LOG.info("grant select privilege to user '{}' for relation: {}",
+                         metrics_user, INCOMING_REPLICATION_STATS_VIEW)
+                with db_connection.cursor() as c:
+                    c.execute(sql.SQL("GRANT SELECT ON {} TO {}").format(
+                        sql.Identifier(INCOMING_REPLICATION_STATS_VIEW),
+                        sql.Identifier(metrics_user)))
+            else:
+                LOG.info("role '{}' already has select privilege to relation: {}",
+                         metrics_user, REPLICATION_STATS_VIEW)
+        else:
+            LOG.info("skipping setup for incoming replication view, requires Postgres version >= %s",
+                     PGVERSION_WAL_RECEIVER)
 
         LOG.info("database '{}' prepared for metrics user: {}", db_name, metrics_user)
