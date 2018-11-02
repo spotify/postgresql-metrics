@@ -1,3 +1,10 @@
+postgresql-metrics (0.2.6) unstable; urgency=low
+
+  * Wrap replication status metric to function
+  * Non superuser can access replication status metric
+
+ -- Hannu Varjoranta <hannu.varjoranta@spotify.com>  Fri, 2 Nov 2018 14:04:00 +0000
+
 postgresql-metrics (0.2.5) unstable; urgency=low
 
   * Report replication status from WAL receivers
