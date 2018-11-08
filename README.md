@@ -30,7 +30,7 @@ technologies.
 
 * Python 2.7
 * PostgreSQL 9.3 or later
-* Debian based distribution with Upstart, if you want to use the packaging functionality
+* Debian based distribution with Upstart or systemd, if you want to use the packaging functionality
 
 
 ## Building and Installing
@@ -42,16 +42,17 @@ root, e.g.:
 debuild -us -uc -b
 ```
 
-Notice that postgresql-metrics includes by default an Upstart script to run
-as long running process, pushing metrics to FFWD as gathered. You need to
-stop the long running process after installing the package for configuration.
+Notice that postgresql-metrics includes by default an Upstart script or systemd
+service to run as long running process, pushing metrics to FFWD as gathered.
+You need to stop the long running process after installing the package for configuration.
 
 ```
 sudo stop postgresql-metrics
 ```
 
 Notice that by default Upstart processes log under */var/log/upstart/*, if you
-want to debug the process.
+want to debug the process. For the systemd service, you can run
+*sudo journalctl -u postgresql-metrics* to see the service's log.
 
 ### Edit Configuration
 
@@ -130,6 +131,12 @@ You can also start the long running process again, if using Upstart:
 
 ```
 sudo start postgresql-metrics
+```
+
+Likewise, if using systemd:
+
+```
+sudo systemctl start postgresql-metrics
 ```
 
 ## Explaining the Gathered Metrics
