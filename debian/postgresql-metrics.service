@@ -1,0 +1,14 @@
+[Unit]
+Description=postgresql-metrics process
+StartLimitInterval=100
+StartLimitBurst=10
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/postgresql-metrics long-running-ffwd
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
