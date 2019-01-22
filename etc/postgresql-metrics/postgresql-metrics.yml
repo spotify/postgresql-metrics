@@ -1,10 +1,10 @@
 ---
 # Notice that this configuration will overwrite the configuration
-# in default folder, keeping the values in default, not overwritten here.
+# in default folder, keeping the unchanged values from default configuration.
 postgres:
     host: "127.0.0.1"
-    user: "my_postgres_user"
-    password: "my_secret"
+    user: "postgresql_metrics_user"
+    password: "postgresql_metrics_password"
     databases:
         - postgres
 

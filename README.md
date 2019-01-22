@@ -3,7 +3,7 @@
 Service to extract and provide metrics on your PostgreSQL database.
 
 This tool is a CLI (command line) tool that can be called to extract
-statistics and create metrics regarding your PostgreSQL database cluster.
+statistics and create metrics from your PostgreSQL database cluster.
 CLI is runnable in long running process mode, which will periodically
 send the gathered metrics forward.
 
@@ -12,10 +12,10 @@ compatible JSON, which is created by a set of functions listed in
 the configuration file.
 
 The extracted metrics can be printed out as direct output of
-the CLI tool or sent out of the host, where the postgresql-metrics
-process is running using [FFWD](https://github.com/spotify/ffwd).
+the CLI tool, or sent out of the host the postgresql-metrics
+process is running in using [FFWD](https://github.com/spotify/ffwd).
 
-Notice that the [FFWD](https://github.com/spotify/ffwd) format is
+The [FFWD](https://github.com/spotify/ffwd) format is
 plain JSON sent over a UDP socket, so you can use whatever
 UDP socket endpoint, which understands JSON, to consume the metrics.
 
@@ -30,28 +30,26 @@ technologies.
 
 * Python 2.7
 * PostgreSQL 9.3 or later
-* Debian based distribution with Upstart or systemd, if you want to use the packaging functionality
+* Debian based distribution with systemd (packaging requirement only)
 
 
 ## Building and Installing
 
-You can build a Debian package out of this by calling *debuild* in project
-root, e.g.:
+You can build a Debian package by running the following in project root:
 
 ```
-debuild -us -uc -b
+dpkg-buildpackage -us -uc -b
 ```
 
-Notice that postgresql-metrics includes by default an Upstart script or systemd
-service to run as long running process, pushing metrics to FFWD as gathered.
+Notice that postgresql-metrics includes by default a systemd service to
+run as long running process, pushing metrics to FFWD as gathered.
 You need to stop the long running process after installing the package for configuration.
 
 ```
-sudo stop postgresql-metrics
+sudo systemctl stop postgresql-metrics
 ```
 
-Notice that by default Upstart processes log under */var/log/upstart/*, if you
-want to debug the process. For the systemd service, you can run
+If you want to debug the process. For the systemd service, you can run
 *sudo journalctl -u postgresql-metrics* to see the service's log.
 
 ### Edit Configuration
@@ -67,8 +65,8 @@ keep using a single configuration file.
 
 Edit at least the values under *postgres* section in the configuration to
 match your PostgreSQL cluster setup. Remember also to list the *databases*
-you want to gather metrics from. Notice that by database in this context
-we mean a database name you created within your PostgreSQL cluster.
+you want to gather metrics from. By database in this context we mean
+a database name you created within your PostgreSQL cluster.
 
 ### Prepare Database
 
@@ -80,7 +78,7 @@ The configured metrics user will be also granted access to the created
 statistics functions and views.
 
 You need to provide administrator user to the *prepare-db* call, which
-the tool is kind enough to ask. You don't need to provide credentials, if
+the tool is kind enough to ask. You don't need to provide credentials if
 you are running the *prepare-db* with a local user that is configured to be
 trusted locally by the PostgreSQL cluster (in *pg_hba.conf*), and is
 a super user, like the default *postgres* user created by some distribution
@@ -103,10 +101,10 @@ Add one line per database you are monitoring into the end of the *pg_hba.conf*
 file for your cluster:
 
 ```
-host my_database_name metrics_user_name 127.0.0.1/32 md5  # metrics user access
+host my_database_name postgresql_metrics_user 127.0.0.1/32 md5  # metrics user access
 ```
 
-Replace the *my_database_name* and *metrics_user_name* with the values you
+Replace the *my_database_name* and *postgresql_metrics_user* with the values you
 configured into the postgresql-metrics configuration in **Edit Configuration**
 step above.
 
@@ -127,13 +125,7 @@ You need to call the command above as a user that has access to the WAL log
 directory under PostgreSQL, or the metric gathering WAL file amounts will fail.
 Single failed metric calls will not prevent the rest of gathering process.
 
-You can also start the long running process again, if using Upstart:
-
-```
-sudo start postgresql-metrics
-```
-
-Likewise, if using systemd:
+You can also start the long running process again, if using systemd:
 
 ```
 sudo systemctl start postgresql-metrics
@@ -144,15 +136,14 @@ sudo systemctl start postgresql-metrics
 This section explains the metrics we gather using this tool.
 
 Notice that there are many system specific metrics that you should gather
-in addition to the Postgres specific metrics. These kind of metrics we do
-not gather, that you should gather with other tools, are for example:
+in addition to the Postgres specific metrics, for example:
 
 * CPU usage
 * Network usage, sent / received bytes per related network interface
+* Memory usage
 * Disk I/O operations
 * I/O await times
-* Disk usage amounts and free space left
-* Memory usage
+* Disk usage and free space left
 
 
 ### Database Specific Metrics

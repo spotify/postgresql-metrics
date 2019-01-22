@@ -14,10 +14,12 @@
 from setuptools import find_packages
 from setuptools import setup
 
+
 def requirements(f):
-  reqs = open(f, 'r').read().splitlines()
-  reqs = [r for r in reqs if not r.strip().startswith('#')]
-  return reqs
+    reqs = open(f, 'r').read().splitlines()
+    reqs = [r for r in reqs if not r.strip().startswith('#')]
+    return reqs
+
 
 setup(name='postgresql-metrics',
       version='0.2.6',
