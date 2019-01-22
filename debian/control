@@ -3,14 +3,14 @@ Section: non-free/net
 Priority: extra
 Maintainer: Hannu Varjoranta <hannu.varjoranta@spotify.com>
 Build-Depends:
-  python (>= 2.7),
-  libpq-dev (<<9.7),
+  python3 (>= 3.5),
+  libpq-dev,
   debhelper (>= 9),
   dh-virtualenv (>= 1.0),
 Standards-Version: 3.9.5
-X-Python-Version: >= 2.7
+X-Python-Version: >= 3.5
 
 Package: postgresql-metrics
 Architecture: any
-Depends: ${misc:Depends}
+Pre-Depends: dpkg (>= 1.16.1), python3 (>= 3.5), ${misc:Pre-Depends}
 Description: Simple service to provide metrics for your PostgreSQL database

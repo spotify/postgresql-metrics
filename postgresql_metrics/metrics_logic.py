@@ -27,7 +27,7 @@ import os
 import socket
 import time
 
-import metrics_gatherer
+from postgresql_metrics import metrics_gatherer
 from postgresql_metrics.postgres_queries import (
     get_db_name_from_connection,
     get_db_connection,
@@ -62,7 +62,7 @@ def push_to_ffwd(metric_dicts, ffwd_addr, data_formatter=json.dumps):
         for metric in metric_dicts:
             data = data_formatter(metric)
             LOG.debug('send UDP packet to {} with data:\n{}', ffwd_addr, data)
-            s.sendto(data, ffwd_addr)
+            s.sendto(bytes(data, 'UTF-8'), ffwd_addr)
     finally:
         s.close()
 
@@ -283,10 +283,10 @@ def main():
         init_logging_stderr(log_level)
         db_connections = get_db_connections_with_conf(conf)
         get_all_metrics_now(db_connections, conf)
-        print "# sleep 5 s to get diffs on derivative metrics"
+        print("# sleep 5 s to get diffs on derivative metrics")
         time.sleep(5.0)
         for metric in get_all_metrics_now(db_connections, conf):
-            print metric
+            print(metric)
 
     elif args.command == 'long-running-ffwd':
         if conf['log']['log_to_stderr'] is True:

@@ -16,7 +16,6 @@ This module defines some basic common application functionality, like logging.
 """
 
 import os
-import types
 
 import logbook
 import yaml
@@ -27,7 +26,7 @@ def get_logger(logger_name="postgresql-metrics"):
 
 
 def figure_out_log_level(given_level):
-    if isinstance(given_level, types.StringTypes):
+    if isinstance(given_level, str):
         return logbook.lookup_level(given_level.strip().upper())
     else:
         return given_level
@@ -83,7 +82,7 @@ def merge_configs(to_be_merged, default):
      ['get_stats_seconds_since_last_vacuum_per_table', 60]]
     """
     if isinstance(to_be_merged, dict) and isinstance(default, dict):
-        for k, v in default.iteritems():
+        for k, v in default.items():
             if k not in to_be_merged:
                 to_be_merged[k] = v
             else:
@@ -113,7 +112,7 @@ def find_and_parse_config(config_path):
     for config_dir in (default_root, config_root):
         current_path = os.path.join(config_dir, config_filename)
         if os.path.isfile(current_path):
-            with file(current_path, 'r') as f:
+            with open(current_path, 'r') as f:
                 read_config_dict = yaml.load(f)
             config_dict = merge_configs(read_config_dict, config_dict)
     return config_dict

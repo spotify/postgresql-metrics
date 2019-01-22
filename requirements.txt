@@ -1,4 +1,4 @@
-psycopg2>=2.6.1
+psycopg2-binary>=2.6.1
 logbook>=0.10.1
 pip>=1.5.4
 pyyaml>=3.11

@@ -37,8 +37,8 @@ INCOMING_REPLICATION_STATS_VIEW = "stat_incoming_replication"
 
 
 def query_user_for_superuser_credentials():
-    username = raw_input("Provide a Postgres role name with superuser privileges "
-                         "in the configured cluster: ")
+    username = input("Provide a Postgres role name with superuser privileges "
+                     "in the configured cluster: ")
     password = getpass.getpass("Give the password: ")
     return username, password
 

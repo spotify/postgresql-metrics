@@ -28,7 +28,7 @@ a pull-request with missing prerequisites, if you test and confirm
 postgresql-metrics to work on other versions of the mentioned
 technologies.
 
-* Python 2.7
+* Python 3.5 or later
 * PostgreSQL 9.3 or later
 * Debian based distribution with systemd (packaging requirement only)
 
