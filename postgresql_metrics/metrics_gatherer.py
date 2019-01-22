@@ -106,7 +106,7 @@ def get_stats_heap_hit_statistics(db_connection):
 def get_stats_lock_statistics(db_connection):
     locks_by_type, [total_locks_waiting, total_locks_granted] = get_lock_statistics(db_connection)
     metrics = []
-    for lock_type, [locks_waiting, locks_granted] in locks_by_type.iteritems():
+    for lock_type, [locks_waiting, locks_granted] in locks_by_type.items():
         metrics.append(metric_locks_granted(lock_type, locks_granted))
         metrics.append(metric_locks_waiting(lock_type, locks_waiting))
     metrics.append(metric_locks_granted("total", total_locks_granted))
