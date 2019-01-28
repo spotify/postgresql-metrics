@@ -1,3 +1,10 @@
+postgresql-metrics (0.3.0) unstable; urgency=low
+
+  * Fix for PostgreSQL versions >= 10
+  * Migrate to using Python3
+
+ -- Hannu Varjoranta <hannu.varjoranta@spotify.com>  Mon, 28 Jan 2019 11:00:00 +0000
+
 postgresql-metrics (0.2.6) unstable; urgency=low
 
   * Wrap replication status metric to function
