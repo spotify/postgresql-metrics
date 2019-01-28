@@ -1,4 +1,4 @@
 #!/usr/bin/make -f
 
 %:
-	dh $@ --with python-virtualenv --python python3 --preinstall=no-manylinux1
+	dh $@ --with python-virtualenv --with systemd --python python3 --preinstall=no-manylinux1
