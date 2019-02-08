@@ -1,4 +1,6 @@
-psycopg2-binary>=2.6.1
+wheel>=0.32.3
+setuptools>=40.8.0
+psycopg2-binary>=2.7
 logbook>=0.10.1
-pip>=1.5.4
+pip>=9
 pyyaml>=3.11

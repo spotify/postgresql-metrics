@@ -4,6 +4,7 @@ Priority: extra
 Maintainer: Hannu Varjoranta <hannu.varjoranta@spotify.com>
 Build-Depends:
   python3 (>= 3.5),
+  python3-dev,
   libpq-dev,
   debhelper (>= 9),
   dh-virtualenv (>= 1.0),
