@@ -113,6 +113,6 @@ def find_and_parse_config(config_path):
         current_path = os.path.join(config_dir, config_filename)
         if os.path.isfile(current_path):
             with open(current_path, 'r') as f:
-                read_config_dict = yaml.load(f)
+                read_config_dict = yaml.safe_load(f)
             config_dict = merge_configs(read_config_dict, config_dict)
     return config_dict
