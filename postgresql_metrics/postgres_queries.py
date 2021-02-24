@@ -184,7 +184,8 @@ def get_lock_statistics(conn):
 
 
 def get_oldest_transaction_timestamp(conn):
-    sql = ("SELECT datname, now(), xact_start FROM pg_stat_activity WHERE xact_start IS NOT NULL "
+    sql = ("SELECT datname, now(), xact_start FROM pg_stat_activity "
+           "WHERE xact_start IS NOT NULL AND datname=current_database() "
            "ORDER BY xact_start ASC LIMIT 1")
     results = query(conn, sql)
     if results:
