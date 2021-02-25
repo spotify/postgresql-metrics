@@ -1,3 +1,10 @@
+postgresql-metrics (0.3.1) unstable; urgency=low
+
+  * Make `sec-since-oldest-xact-start` metric database-specific
+  * Fix building issue with psycopg2
+
+ -- Volodymyr Pavlenko <volodymyrp@spotify.com>  Thu, 25 Feb 2021 10:25:00 +0000
+
 postgresql-metrics (0.3.0) unstable; urgency=low
 
   * Fix for PostgreSQL versions >= 10
