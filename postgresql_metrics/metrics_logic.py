@@ -82,7 +82,7 @@ def _is_time_to_call_stats_func_and_update_ts(database_name, metrics_func, run_i
     return False
 
 
-def _call_all_db_functions(db_parameter, db_stats_functions, schedule=False, db_name=None):
+def _call_all_db_functions(db_stats_functions, db_parameters, schedule=False, db_name=None):
     """Iterates through all given statistics functions, calling them with the given parameter.
     The db_parameter can be a database connection or a file path to Postgres data directory,
     depending on the statistics function to call.
@@ -100,7 +100,7 @@ def _call_all_db_functions(db_parameter, db_stats_functions, schedule=False, db_
         if is_call_required:
             try:
                 LOG.debug('calling stats function {}', db_metrics_func.__name__)
-                metrics.extend(db_metrics_func(db_parameter))
+                metrics.extend(db_metrics_func(*db_parameters))
             except Exception:
                 LOG.exception('failed calling stats function: ' + db_metrics_func.__name__)
     return metrics
@@ -123,8 +123,7 @@ def get_stats_functions_from_conf(func_key_name, conf):
 def get_all_stats_functions_from_conf(conf):
     db_functions = get_stats_functions_from_conf('db_functions', conf)
     global_db_functions = get_stats_functions_from_conf('global_db_functions', conf)
-    data_dir_functions = get_stats_functions_from_conf('data_dir_functions', conf)
-    return db_functions, global_db_functions, data_dir_functions
+    return db_functions, global_db_functions
 
 
 def get_all_metrics_now(db_connections, conf):
@@ -132,13 +131,12 @@ def get_all_metrics_now(db_connections, conf):
     First gets the global stats with first available database connection,
     and then gets the rest per database.
     """
-    db_functions, global_db_functions, data_dir_functions = get_all_stats_functions_from_conf(conf)
+    db_functions, global_db_functions = get_all_stats_functions_from_conf(conf)
     data_dir = figure_out_postgres_data_dir(db_connections[0], conf)
 
-    all_metrics = _call_all_db_functions(db_connections[0], global_db_functions)
-    all_metrics.extend(_call_all_db_functions(data_dir, data_dir_functions))
+    all_metrics = _call_all_db_functions(global_db_functions, (data_dir, db_connections[0]))
     for db_connection in db_connections:
-        all_metrics.extend(_call_all_db_functions(db_connection, db_functions))
+        all_metrics.extend(_call_all_db_functions(db_functions, (data_dir, db_connection)))
     return all_metrics
 
 
@@ -147,14 +145,13 @@ def get_all_metrics_scheduled(db_connections, conf):
     First gets the global stats with first available database connection,
     and then gets the rest per database.
     """
-    db_functions, global_db_functions, data_dir_functions = get_all_stats_functions_from_conf(conf)
+    db_functions, global_db_functions = get_all_stats_functions_from_conf(conf)
     data_dir = figure_out_postgres_data_dir(db_connections[0], conf)
 
-    all_metrics = _call_all_db_functions(db_connections[0], global_db_functions, schedule=True)
-    all_metrics.extend(_call_all_db_functions(data_dir, data_dir_functions, schedule=True))
+    all_metrics = _call_all_db_functions(global_db_functions, (data_dir, db_connections[0]), schedule=True)
     for db_connection in db_connections:
         db_name = get_db_name_from_connection(db_connection)
-        all_metrics.extend(_call_all_db_functions(db_connection, db_functions,
+        all_metrics.extend(_call_all_db_functions(db_functions, (data_dir, db_connection),
                                                   schedule=True, db_name=db_name))
     return all_metrics
 

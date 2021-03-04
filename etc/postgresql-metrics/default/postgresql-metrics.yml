@@ -38,8 +38,7 @@ ffwd:
 # Each entry must be a tuple with the function name, and a time interval in seconds
 # to call that metrics function.
 #
-# db_functions: Functions taking DB connection and returning a list of metrics,
-#               called once per each database in cluster.
+# db_functions: Functions called once per each database in cluster.
 db_functions:
     - ["get_stats_disk_usage_for_database", 180]
     - ["get_stats_tx_rate_for_database", 60]
@@ -52,15 +51,14 @@ db_functions:
     # replication status relies on `pg_stat_wal_receiver`, which is only available on postgres 9.6+
     # - ["get_stats_incoming_replication_status", 30]
 
-# global_db_functions: Functions taking DB connection and returning a list of metrics,
-#                      called once per the whole database cluster.
+# global_db_functions: Functions called once per the whole database cluster.
 global_db_functions:
     - ["get_stats_client_connections", 60]
     - ["get_stats_lock_statistics", 60]
     - ["get_stats_heap_hit_statistics", 60]
     - ["get_stats_replication_delays", 60]
-
-# data_dir_functions: Functions taking a file path to Postgres data dir and returning
-#                     a list of metrics, called once per the whole database cluster.
-data_dir_functions:
     - ["get_stats_wal_file_amount", 180]
+    - ["get_multixact_members_usage_ratio", 60]
+    - ["get_multixact_members_per_mxid", 60]
+    - ["get_multixact_remaining_ratio", 60]
+    - ["get_xid_remaining_ratio", 60]

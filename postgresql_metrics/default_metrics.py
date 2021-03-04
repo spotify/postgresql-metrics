@@ -116,6 +116,29 @@ def metric_sec_since_oldest_xact_start(database_name, value):
                                   'unit': 's'})
 
 
+def metric_xid_remaining_ratio(value):
+    return create_default_metric(value,
+                                 {'what': 'xid-remaining',
+                                  'unit': '%'})
+
+
+def metric_multixact_remaining_ratio(value):
+    return create_default_metric(value,
+                                 {'what': 'mxid-remaining',
+                                  'unit': '%'})
+
+
+def metric_multixact_members_per_mxid(value):
+    return create_default_metric(value,
+                                 {'what': 'multixact-members-per-mxid',
+                                  'unit': 'members/id'})
+
+
+def metric_multixact_members_remaining_ratio(value):
+    return create_default_metric(value,
+                                 {'what': 'multixact-members-remaining',
+                                  'unit': '%'})
+
 def metric_wal_file_amount(value):
     return create_default_metric(value,
                                  {'what': 'wal-file-amount',
