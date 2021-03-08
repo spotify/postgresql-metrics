@@ -174,7 +174,7 @@ def get_multixact_members_per_mxid(data_dir, db_connection):
 
 def get_multixact_members_usage_ratio(data_dir, _db_connection):
     members = _get_multixact_members(data_dir)
-    ratio = members // MAX_MULTIXACT_MEMBERS
+    ratio = round(members / MAX_MULTIXACT_MEMBERS, 2)
     percentage_remaining = (1.0 - ratio) * 100
     return [metric_multixact_members_remaining_ratio(percentage_remaining)]
 
@@ -183,7 +183,7 @@ def get_multixact_remaining_ratio(_data_dir, db_connection):
     mxid_age = get_max_mxid_age(db_connection)
     if not mxid_age:
         return []
-    ratio = mxid_age // WRAPAROUND_LIMIT
+    ratio = round(mxid_age / WRAPAROUND_LIMIT, 2)
     percentage_remaining = (1.0 - ratio) * 100
     return [metric_multixact_remaining_ratio(percentage_remaining)]
 
@@ -192,7 +192,7 @@ def get_xid_remaining_ratio(_data_dir, db_connection):
     xid_age = get_max_xid_age(db_connection)
     if not xid_age:
         return []
-    ratio = xid_age // WRAPAROUND_LIMIT
+    ratio = round(xid_age / WRAPAROUND_LIMIT, 2)
     percentage_remaining = (1.0 - ratio) * 100
     return [metric_xid_remaining_ratio(percentage_remaining)]
 
