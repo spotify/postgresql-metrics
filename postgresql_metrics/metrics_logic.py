@@ -123,7 +123,12 @@ def get_stats_functions_from_conf(func_key_name, conf):
 def get_all_stats_functions_from_conf(conf):
     db_functions = get_stats_functions_from_conf('db_functions', conf)
     global_db_functions = get_stats_functions_from_conf('global_db_functions', conf)
-    return db_functions, global_db_functions
+    # `data_dir_functions` is deprecated, but to preserve backwards compatibility still read
+    data_dir_functions = get_stats_functions_from_conf('data_dir_functions', conf)
+    if data_dir_functions:
+        LOG.warn("data_dir_functions field in config is deprecated -- consider moving functions to global_db_functions")
+    all_global_db_functions = data_dir_functions + global_db_functions
+    return db_functions, all_global_db_functions
 
 
 def get_all_metrics_now(db_connections, conf):
