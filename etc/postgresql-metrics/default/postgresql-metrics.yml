@@ -58,7 +58,7 @@ global_db_functions:
     - ["get_stats_heap_hit_statistics", 60]
     - ["get_stats_replication_delays", 60]
     - ["get_stats_wal_file_amount", 180]
-    - ["get_multixact_members_usage_ratio", 60]
     - ["get_multixact_members_per_mxid", 60]
+    - ["get_multixact_members_remaining_ratio", 60]
     - ["get_multixact_remaining_ratio", 60]
     - ["get_xid_remaining_ratio", 60]

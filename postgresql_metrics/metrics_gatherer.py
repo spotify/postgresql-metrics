@@ -172,7 +172,7 @@ def get_multixact_members_per_mxid(data_dir, db_connection):
     return [metric_multixact_members_per_mxid(members_per_id)]
 
 
-def get_multixact_members_usage_ratio(data_dir, _db_connection):
+def get_multixact_members_remaining_ratio(data_dir, _db_connection):
     members = _get_multixact_members(data_dir)
     ratio = round(members / MAX_MULTIXACT_MEMBERS, 2)
     percentage_remaining = (1.0 - ratio) * 100

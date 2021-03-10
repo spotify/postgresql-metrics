@@ -217,14 +217,21 @@ Called once per your Postgres cluster.
   per each slave. If the slave and the master are in synchronous state,
   the replication delay is zero.
 
-
-### Database Local Directory Based (Global) Metrics
-
 * **get_stats_wal_file_amount**:
   This graph shows the amount of files in your database clusters WAL log
   directory (pg_wal or pg_xlog). If the WAL file amount starts to suddenly
   increase, you probably have issues with your WAL archiving process, which
   might lead to the disk filling up, and you database cluster crashing.
+  
+* **get_xid_remaining_ratio, get_multixact_remaining_ratio, get_multixact_members_remaining_ratio**:
+  These metric shows the corresponding remaining % of transaction ids ("xid"), multixact ids ("mxid"), 
+  and multixact members that are available for postgres to use before exhaustion. 
+  Useful for ensuring that the vacuuming is working as intended for your postgres instance.
+
+* **get_multixact_members_per_mxid**:
+  This metric emits the number of multixact members there are per multixact ID. A larger number means
+  that it'll be quicker for the multixact members exhaustion to happen (as can 
+  be seen in **get_multixact_members_usage_ratio**). 
 
 
 ## Short Overview of Python Modules
