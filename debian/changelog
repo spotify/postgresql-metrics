@@ -1,3 +1,14 @@
+postgresql-metrics (0.3.2) unstable; urgency=low
+
+  * Add metrics for seeing how close the postgres instance is to
+    xid, mxid and member mxid exhaustion.
+     - get_xid_remaining_ratio
+     - get_multixact_remaining_ratio
+     - get_multixact_members_remaining_ratio
+     - get_multixact_members_per_mxid
+
+ -- Andreas Scherman <scherman@spotify.com>  Thu, 11 Mar 2021 11:00:00 +0000
+
 postgresql-metrics (0.3.1) unstable; urgency=low
 
   * Make `sec-since-oldest-xact-start` metric database-specific
