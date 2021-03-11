@@ -43,9 +43,13 @@ from postgresql_metrics.default_metrics import (
     metric_replication_delay_bytes,
     metric_wal_file_amount,
     metric_incoming_replication_running,
+    metric_multixact_members_per_mxid,
+    metric_multixact_remaining_ratio,
+    metric_xid_remaining_ratio,
+    metric_multixact_members_remaining_ratio,
 )
 
-from postgresql_metrics.localhost_postgres_stats import get_amount_of_wal_files
+from postgresql_metrics.localhost_postgres_stats import get_amount_of_wal_files, get_multixact_member_files
 
 from postgresql_metrics.postgres_queries import (
     get_client_connections_amount,
@@ -60,23 +64,29 @@ from postgresql_metrics.postgres_queries import (
     get_replication_delays,
     get_tables_with_oids_for_current_db,
     get_wal_receiver_status,
+    get_max_mxid_age,
+    get_max_xid_age,
 )
 
+MEMBERS_PER_MEMBER_FILE = 52352
+MAX_MULTIXACT_MEMBERS = 2**32
+WRAPAROUND_LIMIT = (2**32/2) - 1
 
 # Notice that all functions here are expected to return a list of metrics.
 # Notice also that the names of these functions should match the configuration.
 
-def get_stats_client_connections(db_connection):
+
+def get_stats_client_connections(_data_dir, db_connection):
     client_amount = get_client_connections_amount(db_connection)
     return [metric_client_connections(client_amount)]
 
 
-def get_stats_disk_usage_for_database(db_connection):
+def get_stats_disk_usage_for_database(_data_dir, db_connection):
     db_size = get_disk_usage_for_database(db_connection)
     return [metric_database_size(db_size[0], db_size[1])]
 
 
-def get_stats_tx_rate_for_database(db_connection):
+def get_stats_tx_rate_for_database(_data_dir, db_connection):
     db_name, tx_rate, tx_rollbacks = get_transaction_rate_for_database(db_connection)
     if tx_rate is not None:
         return [metric_transaction_rate(db_name, tx_rate),
@@ -85,7 +95,7 @@ def get_stats_tx_rate_for_database(db_connection):
         return []
 
 
-def get_stats_seconds_since_last_vacuum_per_table(db_connection):
+def get_stats_seconds_since_last_vacuum_per_table(_data_dir, db_connection):
     last_vacuums_data = get_seconds_since_last_vacuum_per_table(db_connection)
     metrics = []
     for db_name, table_name, seconds_since in last_vacuums_data:
@@ -93,7 +103,7 @@ def get_stats_seconds_since_last_vacuum_per_table(db_connection):
     return metrics
 
 
-def get_stats_heap_hit_statistics(db_connection):
+def get_stats_heap_hit_statistics(_data_dir, db_connection):
     db_name, heap_read, heap_hit, heap_hit_ratio = get_heap_hit_statistics(db_connection)
     metrics = []
     if heap_hit_ratio is not None:
@@ -103,7 +113,7 @@ def get_stats_heap_hit_statistics(db_connection):
     return metrics
 
 
-def get_stats_lock_statistics(db_connection):
+def get_stats_lock_statistics(_data_dir, db_connection):
     locks_by_type, [total_locks_waiting, total_locks_granted] = get_lock_statistics(db_connection)
     metrics = []
     for lock_type, [locks_waiting, locks_granted] in locks_by_type.items():
@@ -114,7 +124,7 @@ def get_stats_lock_statistics(db_connection):
     return metrics
 
 
-def get_stats_oldest_transaction_timestamp(db_connection):
+def get_stats_oldest_transaction_timestamp(_data_dir, db_connection):
     db_name, sec_since_oldest_xact_start = get_oldest_transaction_timestamp(db_connection)
     metrics = []
     if sec_since_oldest_xact_start is not None:
@@ -122,7 +132,7 @@ def get_stats_oldest_transaction_timestamp(db_connection):
     return metrics
 
 
-def get_stats_table_bloat(db_connection):
+def get_stats_table_bloat(_data_dir, db_connection):
     tables_with_oids = get_tables_with_oids_for_current_db(db_connection)
     metrics = []
     for table_oid, table_name in tables_with_oids:
@@ -132,7 +142,7 @@ def get_stats_table_bloat(db_connection):
     return metrics
 
 
-def get_stats_index_hit_rates(db_connection):
+def get_stats_index_hit_rates(_data_dir, db_connection):
     index_hit_rates = get_index_hit_rates(db_connection)
     metrics = []
     for db_name, table_name, index_hit_ratio in index_hit_rates:
@@ -141,7 +151,7 @@ def get_stats_index_hit_rates(db_connection):
     return metrics
 
 
-def get_stats_replication_delays(db_connection):
+def get_stats_replication_delays(_data_dir, db_connection):
     replication_delays = get_replication_delays(db_connection)
     metrics = []
     for client_addr, delay_in_bytes in replication_delays:
@@ -149,10 +159,48 @@ def get_stats_replication_delays(db_connection):
     return metrics
 
 
-def get_stats_wal_file_amount(data_dir):
+def _get_multixact_members(data_dir):
+    return get_multixact_member_files(data_dir) * MEMBERS_PER_MEMBER_FILE
+
+
+def get_multixact_members_per_mxid(data_dir, db_connection):
+    members = _get_multixact_members(data_dir)
+    mxid_age = get_max_mxid_age(db_connection)
+    if not mxid_age:
+        return []
+    members_per_id = round(members / mxid_age, 2)
+    return [metric_multixact_members_per_mxid(members_per_id)]
+
+
+def get_multixact_members_remaining_ratio(data_dir, _db_connection):
+    members = _get_multixact_members(data_dir)
+    ratio = round(members / MAX_MULTIXACT_MEMBERS, 2)
+    percentage_remaining = (1.0 - ratio) * 100
+    return [metric_multixact_members_remaining_ratio(percentage_remaining)]
+
+
+def get_multixact_remaining_ratio(_data_dir, db_connection):
+    mxid_age = get_max_mxid_age(db_connection)
+    if not mxid_age:
+        return []
+    ratio = round(mxid_age / WRAPAROUND_LIMIT, 2)
+    percentage_remaining = (1.0 - ratio) * 100
+    return [metric_multixact_remaining_ratio(percentage_remaining)]
+
+
+def get_xid_remaining_ratio(_data_dir, db_connection):
+    xid_age = get_max_xid_age(db_connection)
+    if not xid_age:
+        return []
+    ratio = round(xid_age / WRAPAROUND_LIMIT, 2)
+    percentage_remaining = (1.0 - ratio) * 100
+    return [metric_xid_remaining_ratio(percentage_remaining)]
+
+
+def get_stats_wal_file_amount(data_dir, _db_connection):
     return [metric_wal_file_amount(get_amount_of_wal_files(data_dir))]
 
 
-def get_stats_incoming_replication_status(db_connection):
+def get_stats_incoming_replication_status(_data_dir, db_connection):
     return [metric_incoming_replication_running(host, is_streaming)
             for host, is_streaming in get_wal_receiver_status(db_connection)]

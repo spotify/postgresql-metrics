@@ -195,6 +195,28 @@ def get_oldest_transaction_timestamp(conn):
     return None, None
 
 
+def get_max_mxid_age(conn):
+    # `mxid_age` is only available on postgres 9.5 and newer
+    if conn.server_version < 95000:
+        LOG.error("Unable to check mxid_age on versions of postgres below 9.5")
+        return None
+    sql = "SELECT max(mxid_age(relminmxid)) FROM pg_class WHERE relminmxid <> '0'"
+    results = query(conn, sql)
+    if not results:
+        return None
+    mxid_age, = results[0]
+    return int(mxid_age)
+
+
+def get_max_xid_age(conn):
+    sql = "SELECT max(age(datfrozenxid)) FROM pg_database"
+    results = query(conn, sql)
+    if not results:
+        return None
+    xid_age, = results[0]
+    return int(xid_age)
+
+
 def get_replication_delays(conn):
     sql = ("SELECT client_addr, "
            "pg_xlog_location_diff(pg_current_xlog_location(), replay_location) AS bytes_diff "
