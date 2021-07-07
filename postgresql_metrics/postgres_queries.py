@@ -221,6 +221,10 @@ def get_replication_delays(conn):
     sql = ("SELECT client_addr, "
            "pg_xlog_location_diff(pg_current_xlog_location(), replay_location) AS bytes_diff "
            "FROM public.pg_stat_repl")
+    if is_in_recovery(conn):
+        # pg_current_xlog_location cannot be called in a replica
+        # use pg_last_xlog_receive_location for monitoring cascade replication
+        sql = sql.replace("pg_current_xlog_location", "pg_last_xlog_receive_location")
     if conn.server_version >= 100000: # PostgreSQL 10 and higher
         sql = sql.replace('_xlog', '_wal')
         sql = sql.replace('_location', '_lsn')
@@ -273,3 +277,7 @@ def get_wal_receiver_status(conn):
         host = CONNINFO_HOST_RE.search(conn_info).groupdict().get('host', 'UNKNOWN')
         host_replication_status.append((host, status))
     return host_replication_status
+
+
+def is_in_recovery(conn):
+    return query(conn, "SELECT pg_is_in_recovery()")[0][0]
