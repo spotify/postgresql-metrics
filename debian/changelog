@@ -1,3 +1,9 @@
+postgresql-metrics (0.3.3) unstable; urgency=low
+
+  * Support cascade replication in get_stats_replication_delays
+
+ -- Richard Mahlberg <richard@spotify.com>  Fri, 9 Jul 2021 06:25:00 +0000
+
 postgresql-metrics (0.3.2) unstable; urgency=low
 
   * Add metrics for seeing how close the postgres instance is to
