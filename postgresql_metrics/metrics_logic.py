@@ -18,7 +18,7 @@ forwarding Postgres metrics into a metrics gatherer using Spotify FFWD.
 
 https://github.com/spotify/ffwd
 
-Notice that the REAMDE.md in the repository root contains short descriptions
+Notice that the README.md in the repository root contains short descriptions
 of all the Python modules within this project.
 """
 import argparse
